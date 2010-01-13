@@ -10,7 +10,7 @@ $(function() {
     pointerY = e.pageY - canvas.position().top;
   });
   canvas.mousewheel(function(e, delta) {
-    var sensitivity = 100.0;
+    var sensitivity = 1000.0;
     viewport.zoom += delta / sensitivity;
   });
   var viewport = new Viewport(canvas);
@@ -28,6 +28,7 @@ $(function() {
   setInterval(draw, 100);
 
   function draw() {
+    ctx.clearRect(0, 0, viewport.width, viewport.height);
     grid.draw(ctx, viewport);
 
     ctx.fillStyle = "rgba(255, 165, 0, 0.4)";
