@@ -1,0 +1,7 @@
+h1. Canvas Mapper
+
+Utility application for viewing grid based maps.  Built on Javascript and Canvas
+
+h2. Copyright
+
+Copyright © 2010 Ryan Sonnek. See LICENSE for details.
