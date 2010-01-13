@@ -72,7 +72,7 @@ Grid.prototype.coordinatesForSquare = function(column, row, viewport) {
   };
 };
 Grid.prototype.squareAt = function(x, y, viewport) {
-  var col = Math.floor((x - this.offsetX) / this.squareSize * viewport.zoom);
-  var row = Math.floor((y - this.offsetY) / this.squareSize * viewport.zoom);
+  var col = Math.floor((x - this.offsetX) / (this.squareSize * viewport.zoom));
+  var row = Math.floor((y - this.offsetY) / (this.squareSize * viewport.zoom));
   return this.coordinatesForSquare(col, row, viewport);
 };
