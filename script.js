@@ -9,10 +9,6 @@ $(function() {
     pointerX = e.pageX - canvas.position().left;
     pointerY = e.pageY - canvas.position().top;
   });
-  canvas.mousewheel(function(e, delta) {
-    var sensitivity = 1000.0;
-    viewport.zoom += delta / sensitivity;
-  });
   var viewport = new Viewport(canvas);
   var grid = new Grid('map.jpg');
   $('#settings').submit(function() {
@@ -41,6 +37,12 @@ Viewport = function(canvas) {
   this.zoom = 1;
   this.width = canvas.width();
   this.height = canvas.height();
+  
+  var self = this;
+  canvas.mousewheel(function(e, delta) {
+    var sensitivity = 0.01;
+    self.zoom += delta * sensitivity;
+  });
 };
 
 Grid = function(image) {
