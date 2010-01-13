@@ -9,7 +9,10 @@ $(function() {
     pointerX = e.pageX - canvas.position().left;
     pointerY = e.pageY - canvas.position().top;
   });
-
+  canvas.mousewheel(function(e, delta) {
+    var sensitivity = 100.0;
+    viewport.zoom += delta / sensitivity;
+  });
   var viewport = new Viewport(canvas);
   var grid = new Grid('map.jpg');
   $('#settings').submit(function() {
@@ -17,7 +20,8 @@ $(function() {
     grid.squareSize = $('#squareSize').val();
     grid.offsetX = $('#offsetX').val();
     grid.offsetY = $('#offsetY').val();
-    
+    grid.lineWidth = $('#lineWidth').val();
+
     return false;
   });
 
@@ -45,11 +49,13 @@ Grid = function(image) {
   this.squareSize = 73;
   this.offsetX = 19;
   this.offsetY = 2;
+  this.lineWidth = 2;
 };
 
 Grid.prototype.draw = function(ctx, viewport) {
   ctx.drawImage(this.background, 0, 0,  viewport.zoom * viewport.width, viewport.zoom * viewport.height);
-  
+
+  ctx.lineWidth = this.lineWidth;
   ctx.strokeStyle = "rgba(100, 100, 100, 1)";
   for (var column = 0; column < this.columns(viewport); column++) {
     for (var row = 0; row < this.rows(viewport); row++) {
