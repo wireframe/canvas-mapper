@@ -11,6 +11,7 @@ $(function() {
   });
   var viewport = new Viewport(canvas);
   var grid = new Grid('map.jpg');
+  
   $('#settings').submit(function() {
     viewport.zoom = $('#zoom').val();
     grid.squareSize = $('#squareSize').val();
@@ -31,15 +32,17 @@ $(function() {
 });
 
 Viewport = function(canvas) {
-  this.zoom = 1;
+  this.zoom = 2.7;
   this.width = canvas.width();
   this.height = canvas.height();
   
+  $('#zoom').val(this.zoom);
   var self = this;
   canvas.mousewheel(function(e, delta) {
     var sensitivity = 0.01;
-    self.zoom += (delta * sensitivity);
+    self.zoom += delta * sensitivity;
     $('#zoom').val(self.zoom);
+    return false;
   });
 };
 
@@ -47,12 +50,14 @@ Grid = function(image) {
   this.background = new Image();
   this.background.src = image;
 
-  this.squareSize = 73;
+  this.squareSize = 40;
   this.lineWidth = 1;
+
+  $('#squareSize').val(this.squareSize);
 };
 
 Grid.prototype.draw = function(ctx, viewport) {
-  ctx.drawImage(this.background, 0, 0,  viewport.zoom * viewport.width, viewport.zoom * viewport.height);
+  ctx.drawImage(this.background, 0, 0, viewport.width / viewport.zoom, viewport.height / viewport.zoom, 0, 0, viewport.width, viewport.height);
 
   ctx.lineWidth = this.lineWidth;
   ctx.strokeStyle = "rgba(100, 100, 100, 1)";
