@@ -61,19 +61,25 @@ Grid.prototype.draw = function(ctx, viewport) {
 
   ctx.lineWidth = this.lineWidth;
   ctx.strokeStyle = "rgba(100, 100, 100, 1)";
-  for (var column = 0; column < this.columns(viewport); column++) {
-    for (var row = 0; row < this.rows(viewport); row++) {
+  for (var column = 0; column < this.visibleColumns(viewport); column++) {
+    for (var row = 0; row < this.visibleRows(viewport); row++) {
       var square = this.coordinatesForSquare(column, row, viewport);
       ctx.strokeRect(square.x, square.y, this.squareSize * viewport.zoom, this.squareSize * viewport.zoom);
     }
   }
 };
 
-Grid.prototype.columns = function(viewport) {
-  return viewport.width / this.squareSize;
+Grid.prototype.maxColumns = function() {
+  return Math.floor(this.background.width / this.squareSize);
 };
-Grid.prototype.rows = function(viewport) {
-  return viewport.height / this.squareSize;
+Grid.prototype.maxRows = function() {
+  return Math.floor(this.background.height / this.squareSize);
+};
+Grid.prototype.visibleColumns = function(viewport) {
+  return Math.min((viewport.width / this.squareSize), this.maxColumns());
+};
+Grid.prototype.visibleRows = function(viewport) {
+  return Math.min((viewport.height / this.squareSize), this.maxRows());
 };
 Grid.prototype.coordinatesForSquare = function(column, row, viewport) {
   return {
