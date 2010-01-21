@@ -9,11 +9,11 @@ $(function() {
     pointerX = e.pageX - canvas.position().left;
     pointerY = e.pageY - canvas.position().top;
   });
+
   var viewport = new Viewport(canvas);
   var grid = new Grid('map.jpg');
   
   $('#settings').submit(function() {
-    viewport.zoom = $('#zoom').val();
     grid.squareSize = $('#squareSize').val();
 
     return false;
@@ -27,44 +27,34 @@ $(function() {
 
     ctx.fillStyle = "rgba(255, 165, 0, 0.4)";
     var hoverSquare = grid.squareAt(pointerX, pointerY, viewport);
-    ctx.fillRect(hoverSquare.x, hoverSquare.y, grid.squareSize * viewport.zoom, grid.squareSize * viewport.zoom);
+    ctx.fillRect(hoverSquare.x, hoverSquare.y, grid.squareSize, grid.squareSize);
   }
 });
 
 Viewport = function(canvas) {
-  this.zoom = 2.7;
   this.width = canvas.width();
   this.height = canvas.height();
-  
-  $('#zoom').val(this.zoom);
-  var self = this;
-  canvas.mousewheel(function(e, delta) {
-    var sensitivity = 0.01;
-    self.zoom += delta * sensitivity;
-    $('#zoom').val(self.zoom);
-    return false;
-  });
 };
 
 Grid = function(image) {
   this.background = new Image();
   this.background.src = image;
 
-  this.squareSize = 40;
+  this.squareSize = 32;
   this.lineWidth = 1;
 
   $('#squareSize').val(this.squareSize);
 };
 
 Grid.prototype.draw = function(ctx, viewport) {
-  ctx.drawImage(this.background, 0, 0, viewport.width / viewport.zoom, viewport.height / viewport.zoom, 0, 0, viewport.width, viewport.height);
+  ctx.drawImage(this.background, 0, 0, viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
 
   ctx.lineWidth = this.lineWidth;
   ctx.strokeStyle = "rgba(100, 100, 100, 1)";
   for (var column = 0; column < this.visibleColumns(viewport); column++) {
     for (var row = 0; row < this.visibleRows(viewport); row++) {
       var square = this.coordinatesForSquare(column, row, viewport);
-      ctx.strokeRect(square.x, square.y, this.squareSize * viewport.zoom, this.squareSize * viewport.zoom);
+      ctx.strokeRect(square.x, square.y, this.squareSize, this.squareSize);
     }
   }
 };
@@ -83,12 +73,12 @@ Grid.prototype.visibleRows = function(viewport) {
 };
 Grid.prototype.coordinatesForSquare = function(column, row, viewport) {
   return {
-    x: column * this.squareSize * viewport.zoom,
-    y: row * this.squareSize * viewport.zoom
+    x: column * this.squareSize,
+    y: row * this.squareSize
   };
 };
 Grid.prototype.squareAt = function(x, y, viewport) {
-  var col = Math.floor(x / (this.squareSize * viewport.zoom));
-  var row = Math.floor(y / (this.squareSize * viewport.zoom));
+  var col = Math.floor(x / this.squareSize);
+  var row = Math.floor(y / this.squareSize);
   return this.coordinatesForSquare(col, row, viewport);
 };
