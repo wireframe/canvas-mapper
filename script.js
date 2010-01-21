@@ -14,9 +14,6 @@ $(function() {
   $('#settings').submit(function() {
     viewport.zoom = $('#zoom').val();
     grid.squareSize = $('#squareSize').val();
-    grid.offsetX = $('#offsetX').val();
-    grid.offsetY = $('#offsetY').val();
-    grid.lineWidth = $('#lineWidth').val();
 
     return false;
   });
@@ -41,7 +38,8 @@ Viewport = function(canvas) {
   var self = this;
   canvas.mousewheel(function(e, delta) {
     var sensitivity = 0.01;
-    self.zoom += delta * sensitivity;
+    self.zoom += (delta * sensitivity);
+    $('#zoom').val(self.zoom);
   });
 };
 
@@ -50,9 +48,7 @@ Grid = function(image) {
   this.background.src = image;
 
   this.squareSize = 73;
-  this.offsetX = 19;
-  this.offsetY = 2;
-  this.lineWidth = 2;
+  this.lineWidth = 1;
 };
 
 Grid.prototype.draw = function(ctx, viewport) {
@@ -76,12 +72,12 @@ Grid.prototype.rows = function(viewport) {
 };
 Grid.prototype.coordinatesForSquare = function(column, row, viewport) {
   return {
-    x: column * this.squareSize * viewport.zoom + this.offsetX * viewport.zoom,
-    y: row * this.squareSize * viewport.zoom + this.offsetY * viewport.zoom
+    x: column * this.squareSize * viewport.zoom,
+    y: row * this.squareSize * viewport.zoom
   };
 };
 Grid.prototype.squareAt = function(x, y, viewport) {
-  var col = Math.floor((x - this.offsetX) / (this.squareSize * viewport.zoom));
-  var row = Math.floor((y - this.offsetY) / (this.squareSize * viewport.zoom));
+  var col = Math.floor(x / (this.squareSize * viewport.zoom));
+  var row = Math.floor(y / (this.squareSize * viewport.zoom));
   return this.coordinatesForSquare(col, row, viewport);
 };
