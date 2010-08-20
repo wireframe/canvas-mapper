@@ -1,17 +1,8 @@
 $(function() {
-
   var canvas = $('#map');
-  var ctx = canvas[0].getContext("2d");
 
-  var pointerX = 0;
-  var pointerY = 0;
-  canvas.mousemove(function(e) {
-    pointerX = e.pageX - canvas.position().left;
-    pointerY = e.pageY - canvas.position().top;
-  });
-
-  var viewport = new Viewport(canvas);
   var grid = new Grid('map.jpg');
+  var viewport = new Viewport(canvas, grid);
   
   $('#settings').submit(function() {
     grid.squareSize = $('#squareSize').val();
@@ -19,21 +10,54 @@ $(function() {
     return false;
   });
 
-  setInterval(draw, 100);
-
-  function draw() {
-    ctx.clearRect(0, 0, viewport.width, viewport.height);
-    grid.draw(ctx, viewport);
-
-    ctx.fillStyle = "rgba(255, 165, 0, 0.4)";
-    var hoverSquare = grid.squareAt(pointerX, pointerY, viewport);
-    ctx.fillRect(hoverSquare.x, hoverSquare.y, grid.squareSize, grid.squareSize);
-  }
+  setInterval(function() { viewport.draw(); }, 100);
 });
 
-Viewport = function(canvas) {
+Viewport = function(canvas, grid) {
   this.width = canvas.width();
   this.height = canvas.height();
+
+  this.pointerX = 0;
+  this.pointerY = 0;
+  this.grid = grid;
+  this.context = canvas[0].getContext("2d");
+
+  var self = this;
+  canvas.mousemove(function(e) {
+    self.pointerX = e.pageX - canvas.position().left;
+    self.pointerY = e.pageY - canvas.position().top;
+  });
+
+  var scale = 1;
+  var originx = 0;
+  var originy = 0;
+  canvas[0].onmousewheel = function(event) {
+    var mousex = event.clientX - canvas.offsetLeft;
+    var mousey = event.clientY - canvas.offsetTop;
+    var wheel = event.wheelDelta / 120;//n or -n
+
+    var zoom = 1 + wheel/2;
+
+    self.context.translate(originx, originy);
+    self.context.scale(zoom, zoom);
+    self.context.translate(
+        -( mousex / scale + originx - mousex / ( scale * zoom ) ),
+        -( mousey / scale + originy - mousey / ( scale * zoom ) )
+    );
+
+    originx = ( mousex / scale + originx - mousex / ( scale * zoom ) );
+    originy = ( mousey / scale + originy - mousey / ( scale * zoom ) );
+    scale *= zoom;
+  };
+};
+
+Viewport.prototype.draw = function() {
+  this.context.clearRect(0, 0, this.width, this.height);
+  this.grid.draw(this.context, this);
+
+  this.context.fillStyle = "rgba(255, 165, 0, 0.4)";
+  var hoverSquare = this.grid.squareAt(this.pointerX, this.pointerY, this);
+  this.context.fillRect(hoverSquare.x, hoverSquare.y, this.grid.squareSize, this.grid.squareSize);
 };
 
 Grid = function(image) {
@@ -46,15 +70,15 @@ Grid = function(image) {
   $('#squareSize').val(this.squareSize);
 };
 
-Grid.prototype.draw = function(ctx, viewport) {
-  ctx.drawImage(this.background, 0, 0, viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
+Grid.prototype.draw = function(context, viewport) {
+  context.drawImage(this.background, 0, 0, viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
 
-  ctx.lineWidth = this.lineWidth;
-  ctx.strokeStyle = "rgba(100, 100, 100, 1)";
+  context.lineWidth = this.lineWidth;
+  context.strokeStyle = "rgba(100, 100, 100, 1)";
   for (var column = 0; column < this.visibleColumns(viewport); column++) {
     for (var row = 0; row < this.visibleRows(viewport); row++) {
       var square = this.coordinatesForSquare(column, row, viewport);
-      ctx.strokeRect(square.x, square.y, this.squareSize, this.squareSize);
+      context.strokeRect(square.x, square.y, this.squareSize, this.squareSize);
     }
   }
 };
