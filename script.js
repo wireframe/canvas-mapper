@@ -1,9 +1,8 @@
 $(function() {
   var canvas = $('#map');
-
   var grid = new Grid('map.jpg');
   var viewport = new Viewport(canvas, grid);
-  
+
   $('#settings').submit(function() {
     grid.squareSize = $('#squareSize').val();
 
@@ -49,6 +48,8 @@ Viewport = function(canvas, grid) {
     originy = ( mousey / scale + originy - mousey / ( scale * zoom ) );
     scale *= zoom;
   };
+
+  this.token = new Token('token.jpg', grid);
 };
 
 Viewport.prototype.draw = function() {
@@ -58,6 +59,8 @@ Viewport.prototype.draw = function() {
   this.context.fillStyle = "rgba(255, 165, 0, 0.4)";
   var hoverSquare = this.grid.squareAt(this.pointerX, this.pointerY, this);
   this.context.fillRect(hoverSquare.x, hoverSquare.y, this.grid.squareSize, this.grid.squareSize);
+
+  this.token.draw(this.context);
 };
 
 Grid = function(image) {
@@ -105,4 +108,17 @@ Grid.prototype.squareAt = function(x, y, viewport) {
   var col = Math.floor(x / this.squareSize);
   var row = Math.floor(y / this.squareSize);
   return this.coordinatesForSquare(col, row, viewport);
+};
+
+
+Token = function(image, grid) {
+  this.image = new Image();
+  this.image.src = image;
+
+  this.grid = grid
+};
+Token.prototype = {
+  draw: function(context) {
+    context.drawImage(this.image, 0, 0, this.grid.squareSize, this.grid.squareSize);
+  }
 };
