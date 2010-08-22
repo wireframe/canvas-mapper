@@ -10,6 +10,11 @@ $(function() {
     return false;
   });
 
+  $('#squareSize').val(grid.squareSize);
+  if (grid.showGridLines) {
+    $('#showGridLines').attr('checked', 'checked');
+  }
+
   setInterval(function() { viewport.draw(); }, 100);
 });
 
@@ -71,8 +76,6 @@ Grid = function(image) {
   this.squareSize = 32;
   this.lineWidth = 1;
   this.showGridLines = true;
-
-  $('#squareSize').val(this.squareSize);
 };
 
 Grid.prototype.draw = function(context, viewport) {
