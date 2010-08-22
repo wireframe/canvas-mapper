@@ -5,6 +5,7 @@ $(function() {
 
   $('#settings').submit(function() {
     grid.squareSize = $('#squareSize').val();
+    grid.showGridLines = $('#showGridLines').is(':checked');
 
     return false;
   });
@@ -69,6 +70,7 @@ Grid = function(image) {
 
   this.squareSize = 32;
   this.lineWidth = 1;
+  this.showGridLines = true;
 
   $('#squareSize').val(this.squareSize);
 };
@@ -76,12 +78,14 @@ Grid = function(image) {
 Grid.prototype.draw = function(context, viewport) {
   context.drawImage(this.background, 0, 0, viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
 
-  context.lineWidth = this.lineWidth;
-  context.strokeStyle = "rgba(100, 100, 100, 1)";
-  for (var column = 0; column < this.visibleColumns(viewport); column++) {
-    for (var row = 0; row < this.visibleRows(viewport); row++) {
-      var square = this.coordinatesForSquare(column, row, viewport);
-      context.strokeRect(square.x, square.y, this.squareSize, this.squareSize);
+  if (this.showGridLines) {
+    context.lineWidth = this.lineWidth;
+    context.strokeStyle = "rgba(100, 100, 100, 1)";
+    for (var column = 0; column < this.visibleColumns(viewport); column++) {
+      for (var row = 0; row < this.visibleRows(viewport); row++) {
+        var square = this.coordinatesForSquare(column, row, viewport);
+        context.strokeRect(square.x, square.y, this.squareSize, this.squareSize);
+      }
     }
   }
 };
@@ -119,6 +123,11 @@ Token = function(image, grid) {
 };
 Token.prototype = {
   draw: function(context) {
+    context.save();
+    context.beginPath();
+    context.arc(this.grid.squareSize / 2, this.grid.squareSize / 2, this.grid.squareSize / 2, 0, Math.PI * 2, true);
+    context.clip();
     context.drawImage(this.image, 0, 0, this.grid.squareSize, this.grid.squareSize);
+    context.restore();
   }
 };
