@@ -65,7 +65,9 @@ Viewport.prototype = {
     this.context.fillRect(hoverSquare.x, hoverSquare.y, this.grid.squareSize, this.grid.squareSize);
 
     this.token.draw(this.context);
-  } 
+    this.token.positionX += 1;
+    this.token.positionY += 1;
+  }
 };
 
 Grid = function(image) {
@@ -120,28 +122,41 @@ Token = function(image, grid) {
   this.image = new Image();
   this.image.src = image;
 
-  this.grid = grid
+  this.isBloodied = true;
+  this.positionX = 0;
+  this.positionY = 0;
+  this.grid = grid;
 };
 Token.prototype = {
   draw: function(context) {
     context.save();
     //setup clipping to make image rounded
     context.beginPath();
-    context.arc(this.grid.squareSize / 2, this.grid.squareSize / 2, this.grid.squareSize / 2, 0, Math.PI * 2, true);
+    context.arc(this.tokenCenterpoint().x, this.tokenCenterpoint().y, this.tokenRadius(), 0, Math.PI * 2, true);
     context.clip();
 
-    context.drawImage(this.image, 0, 0, this.grid.squareSize, this.grid.squareSize);
+    context.drawImage(this.image, this.positionX, this.positionY, this.grid.squareSize, this.grid.squareSize);
 
     //draw border around token
     context.beginPath();
-    context.strokeStyle = 'rgba(' + (this.isBloodied() ? 255 : 0) + ', 0, 0, 0.7)';
-    context.lineWidth = 4;
-    context.arc(this.grid.squareSize / 2, this.grid.squareSize / 2, this.grid.squareSize / 2, 0, Math.PI * 2, true);
+    context.strokeStyle = this.borderColor();
+    context.lineWidth = this.borderWidth;
+    context.arc(this.tokenCenterpoint().x, this.tokenCenterpoint().y, this.tokenRadius(), 0, Math.PI * 2, true);
     context.stroke();
 
     context.restore();
   },
-  isBloodied: function() {
-    return true;
+  borderWidth: 4,
+  borderColor: function() {
+    return 'rgba(' + (this.isBloodied ? 255 : 0) + ', 0, 0, 0.7)';
+  },
+  tokenCenterpoint: function() {
+    return {
+      x: this.positionX + this.tokenRadius(),
+      y: this.positionY + this.tokenRadius()
+    };
+  },
+  tokenRadius: function() {
+    return this.grid.squareSize / 2;
   }
 };
