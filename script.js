@@ -36,12 +36,10 @@ Viewport = function(canvas, grid) {
   var scale = 1;
   var originx = 0;
   var originy = 0;
-  canvas[0].onmousewheel = function(event) {
+  canvas.mousewheel(function(event, delta) {
     var mousex = event.clientX - canvas.offsetLeft;
     var mousey = event.clientY - canvas.offsetTop;
-    var wheel = event.wheelDelta / 120;//n or -n
-
-    var zoom = 1 + wheel/2;
+    var zoom = 1 + delta/2;
 
     self.context.translate(originx, originy);
     self.context.scale(zoom, zoom);
@@ -53,7 +51,7 @@ Viewport = function(canvas, grid) {
     originx = ( mousex / scale + originx - mousex / ( scale * zoom ) );
     originy = ( mousey / scale + originy - mousey / ( scale * zoom ) );
     scale *= zoom;
-  };
+  });
 
   this.token = new Token('token.jpg', grid);
 };
