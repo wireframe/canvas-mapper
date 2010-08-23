@@ -55,16 +55,17 @@ Viewport = function(canvas, grid) {
 
   this.token = new Token('token.jpg', grid);
 };
+Viewport.prototype = {
+  draw: function() {
+    this.context.clearRect(0, 0, this.width, this.height);
+    this.grid.draw(this.context, this);
 
-Viewport.prototype.draw = function() {
-  this.context.clearRect(0, 0, this.width, this.height);
-  this.grid.draw(this.context, this);
+    this.context.fillStyle = "rgba(255, 165, 0, 0.4)";
+    var hoverSquare = this.grid.squareAt(this.pointerX, this.pointerY, this);
+    this.context.fillRect(hoverSquare.x, hoverSquare.y, this.grid.squareSize, this.grid.squareSize);
 
-  this.context.fillStyle = "rgba(255, 165, 0, 0.4)";
-  var hoverSquare = this.grid.squareAt(this.pointerX, this.pointerY, this);
-  this.context.fillRect(hoverSquare.x, hoverSquare.y, this.grid.squareSize, this.grid.squareSize);
-
-  this.token.draw(this.context);
+    this.token.draw(this.context);
+  } 
 };
 
 Grid = function(image) {
@@ -75,46 +76,45 @@ Grid = function(image) {
   this.lineWidth = 1;
   this.showGridLines = true;
 };
+Grid.prototype = {
+  draw: function(context, viewport) {
+    context.drawImage(this.background, 0, 0, viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
 
-Grid.prototype.draw = function(context, viewport) {
-  context.drawImage(this.background, 0, 0, viewport.width, viewport.height, 0, 0, viewport.width, viewport.height);
-
-  if (this.showGridLines) {
-    context.lineWidth = this.lineWidth;
-    context.strokeStyle = "rgba(100, 100, 100, 1)";
-    for (var column = 0; column < this.visibleColumns(viewport); column++) {
-      for (var row = 0; row < this.visibleRows(viewport); row++) {
-        var square = this.coordinatesForSquare(column, row, viewport);
-        context.strokeRect(square.x, square.y, this.squareSize, this.squareSize);
+    if (this.showGridLines) {
+      context.lineWidth = this.lineWidth;
+      context.strokeStyle = "rgba(100, 100, 100, 1)";
+      for (var column = 0; column < this.visibleColumns(viewport); column++) {
+        for (var row = 0; row < this.visibleRows(viewport); row++) {
+          var square = this.coordinatesForSquare(column, row, viewport);
+          context.strokeRect(square.x, square.y, this.squareSize, this.squareSize);
+        }
       }
     }
+  },
+  maxColumns: function() {
+    return Math.floor(this.background.width / this.squareSize);
+  },
+  maxRows: function() {
+    return Math.floor(this.background.height / this.squareSize);
+  },
+  visibleColumns: function(viewport) {
+    return Math.min((viewport.width / this.squareSize), this.maxColumns());
+  },
+  visibleRows: function(viewport) {
+    return Math.min((viewport.height / this.squareSize), this.maxRows());
+  },
+  coordinatesForSquare: function(column, row, viewport) {
+    return {
+      x: column * this.squareSize,
+      y: row * this.squareSize
+    };
+  },
+  squareAt: function(x, y, viewport) {
+    var col = Math.floor(x / this.squareSize);
+    var row = Math.floor(y / this.squareSize);
+    return this.coordinatesForSquare(col, row, viewport);
   }
 };
-
-Grid.prototype.maxColumns = function() {
-  return Math.floor(this.background.width / this.squareSize);
-};
-Grid.prototype.maxRows = function() {
-  return Math.floor(this.background.height / this.squareSize);
-};
-Grid.prototype.visibleColumns = function(viewport) {
-  return Math.min((viewport.width / this.squareSize), this.maxColumns());
-};
-Grid.prototype.visibleRows = function(viewport) {
-  return Math.min((viewport.height / this.squareSize), this.maxRows());
-};
-Grid.prototype.coordinatesForSquare = function(column, row, viewport) {
-  return {
-    x: column * this.squareSize,
-    y: row * this.squareSize
-  };
-};
-Grid.prototype.squareAt = function(x, y, viewport) {
-  var col = Math.floor(x / this.squareSize);
-  var row = Math.floor(y / this.squareSize);
-  return this.coordinatesForSquare(col, row, viewport);
-};
-
 
 Token = function(image, grid) {
   this.image = new Image();
@@ -125,10 +125,23 @@ Token = function(image, grid) {
 Token.prototype = {
   draw: function(context) {
     context.save();
+    //setup clipping to make image rounded
     context.beginPath();
     context.arc(this.grid.squareSize / 2, this.grid.squareSize / 2, this.grid.squareSize / 2, 0, Math.PI * 2, true);
     context.clip();
+
     context.drawImage(this.image, 0, 0, this.grid.squareSize, this.grid.squareSize);
+
+    //draw border around token
+    context.beginPath();
+    context.strokeStyle = 'rgba(' + (this.isBloodied() ? 255 : 0) + ', 0, 0, 0.7)';
+    context.lineWidth = 4;
+    context.arc(this.grid.squareSize / 2, this.grid.squareSize / 2, this.grid.squareSize / 2, 0, Math.PI * 2, true);
+    context.stroke();
+
     context.restore();
+  },
+  isBloodied: function() {
+    return true;
   }
 };
