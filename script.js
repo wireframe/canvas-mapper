@@ -165,3 +165,53 @@ Token.prototype = {
     // return this.context.isPointInPath(x, y);
   }
 };
+
+
+//cake.js version
+$(function() {
+  var c = E.canvas(500, 500);          // create a new canvas element
+  var canvas = new Canvas(c);         // create a CAKE [Canvas] for the element
+  var background = new Image();
+  background.src = 'map.jpg';
+  canvas.fill = new Pattern(background, 'no-repeat');
+
+  var rect = new Rectangle(100, 100);  // create a CAKE [Rectangle] object
+  rect.x = 250;                        // move the Rectangle to (250, 250)
+  rect.y = 250;
+  rect.fill = 'green';                 // fill the Rectangle with green color
+  // rotate the Rectangle on every frame
+  rect.addFrameListener(function(t) {
+    this.rotation = ((t / 3000) % 1) * Math.PI * 2; 
+  });
+  canvas.append(rect);                 // append the Rectangle to the Canvas
+
+  var circle = new Circle(16);
+  circle.x = 16;
+  circle.y = 16;
+  circle.stroke = 'red';
+  circle.strokeWidth = 2;
+  circle.clip = true;
+
+  var token = ImageNode.load('token.jpg');
+  token.dX = -16,
+  token.dY = -16;
+  token.dWidth = 32;
+  token.dHeight = 32;
+  circle.append(token);
+
+  circle.when('mousemove', function(){
+    alert('here');
+    this.stroke = 'blue';
+  });
+
+  circle.when('mouseover', function() {
+    alert('here');
+    circle.stroke = 'blue';
+  });
+
+  canvas.append(circle);
+  // circle.fillStyle = 'red'
+  
+  
+  document.body.appendChild(c);
+});
