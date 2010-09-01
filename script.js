@@ -169,49 +169,52 @@ Token.prototype = {
 
 //cake.js version
 $(function() {
-  var c = E.canvas(500, 500);          // create a new canvas element
-  var canvas = new Canvas(c);         // create a CAKE [Canvas] for the element
+  var canvas = new Canvas(document.body, 600, 600);
   var background = new Image();
   background.src = 'map.jpg';
   canvas.fill = new Pattern(background, 'no-repeat');
 
-  var rect = new Rectangle(100, 100);  // create a CAKE [Rectangle] object
-  rect.x = 250;                        // move the Rectangle to (250, 250)
-  rect.y = 250;
-  rect.fill = 'green';                 // fill the Rectangle with green color
-  // rotate the Rectangle on every frame
-  rect.addFrameListener(function(t) {
-    this.rotation = ((t / 3000) % 1) * Math.PI * 2; 
-  });
-  canvas.append(rect);                 // append the Rectangle to the Canvas
-
-  var circle = new Circle(16);
-  circle.x = 16;
-  circle.y = 16;
+  var borderWidth = 2;
+  var gridWidth = 64;
+  var radius = gridWidth / 2;
+  var circle = new Circle(radius - borderWidth);
+  circle.x = radius;
+  circle.y = radius;
   circle.stroke = 'red';
-  circle.strokeWidth = 2;
+  circle.strokeWidth = borderWidth;
   circle.clip = true;
+  circle.pickable = true;
+  circle.makeDraggable();
 
   var token = ImageNode.load('token.jpg');
-  token.dX = -16,
-  token.dY = -16;
-  token.dWidth = 32;
-  token.dHeight = 32;
+  token.dX = -radius,
+  token.dY = -radius;
+  token.dWidth = gridWidth;
+  token.dHeight = gridWidth;
   circle.append(token);
 
-  circle.when('mousemove', function(){
-    alert('here');
-    this.stroke = 'blue';
+  circle.when('mousemove', function(e){
+    // this.stroke = 'black';
+    // console.log(e);
   });
-
+  circle.when('focus', function(e){
+    this.focused = true;
+    // console.log(e);
+  });
+  circle.when('blur', function(){
+    this.focused = false;
+  });
+  circle.when('mousemove', function() {
+    if (this.focused) {
+      
+    }
+  });
   circle.when('mouseover', function() {
-    alert('here');
     circle.stroke = 'blue';
+  });
+  circle.when('mouseout', function() {
+    circle.stroke = 'red';
   });
 
   canvas.append(circle);
-  // circle.fillStyle = 'red'
-  
-  
-  document.body.appendChild(c);
 });
