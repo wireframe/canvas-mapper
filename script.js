@@ -1,23 +1,3 @@
-$(function() {
-  var canvas = $('#map');
-  var grid = new Grid('map.jpg');
-  var viewport = new Viewport(canvas, grid);
-
-  $('#settings').submit(function() {
-    grid.squareSize = $('#squareSize').val();
-    grid.showGridLines = $('#showGridLines').is(':checked');
-
-    return false;
-  });
-
-  $('#squareSize').val(grid.squareSize);
-  if (grid.showGridLines) {
-    $('#showGridLines').attr('checked', 'checked');
-  }
-
-  setInterval(function() { viewport.draw(); }, 100);
-});
-
 Viewport = function(canvas, grid) {
   this.width = canvas.width();
   this.height = canvas.height();
@@ -167,7 +147,6 @@ Token.prototype = {
 };
 
 
-//cake.js version
 $(function() {
   var canvas = new Canvas(document.body, 600, 600);
   var background = new Image();
@@ -203,11 +182,6 @@ $(function() {
   });
   circle.when('blur', function(){
     this.focused = false;
-  });
-  circle.when('mousemove', function() {
-    if (this.focused) {
-      
-    }
   });
   circle.when('mouseover', function() {
     circle.stroke = 'blue';
