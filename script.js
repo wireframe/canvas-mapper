@@ -162,7 +162,6 @@ $(function() {
   circle.stroke = 'red';
   circle.strokeWidth = borderWidth;
   circle.clip = true;
-  circle.pickable = true;
   circle.makeDraggable();
 
   var token = ImageNode.load('token.jpg');
