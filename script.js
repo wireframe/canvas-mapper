@@ -102,69 +102,21 @@ Grid.prototype = {
   }
 };
 
-Token = function(image, grid) {
-  this.image = new Image();
-  this.image.src = image;
-
-  this.isBloodied = true;
+Token = function(image) {
   this.positionX = 0;
   this.positionY = 0;
-  this.grid = grid;
-};
-Token.prototype = {
-  draw: function(context, viewport) {
-    context.save();
-    context.translate(this.positionX, this.positionY);
-
-    //setup clipping to make image rounded
-    context.beginPath();
-    context.arc(this.tokenRadius(), this.tokenRadius(), this.tokenRadius(), 0, Math.PI * 2, true);
-    context.clip();
-
-    context.drawImage(this.image, 0, 0, this.grid.squareSize, this.grid.squareSize);
-
-    //draw border around token
-    var isMouseHover = context.isPointInPath(viewport.mouseX, viewport.mouseY);
-    context.strokeStyle = isMouseHover ? 'rgba(255, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.7)';
-    context.lineWidth = this.borderWidth;
-    context.stroke();
-
-    context.restore();
-  },
-  borderWidth: 4,
-  borderColor: function() {
-    return 'rgba(' + (this.isBloodied ? 255 : 0) + ', 0, 0, 0.7)';
-  },
-  tokenRadius: function() {
-    return this.grid.squareSize / 2;
-  },
-  isWithinBounds: function(x, y) {
-    return false;
-    // this.context.beginPath();
-    // this.context.arc(this.tokenCenterpoint().x, this.tokenCenterpoint().y, this.tokenRadius(), 0, Math.PI * 2, true);
-    // return this.context.isPointInPath(x, y);
-  }
-};
-
-
-$(function() {
-  var canvas = new Canvas(document.body, 600, 600);
-  var background = new Image();
-  background.src = 'map.jpg';
-  canvas.fill = new Pattern(background, 'no-repeat');
-
-  var borderWidth = 2;
+  
   var gridWidth = 64;
   var radius = gridWidth / 2;
-  var circle = new Circle(radius - borderWidth);
+  var circle = new Circle(radius - this.borderWidth);
   circle.x = radius;
   circle.y = radius;
   circle.stroke = 'red';
-  circle.strokeWidth = borderWidth;
+  circle.strokeWidth = this.borderWidth;
   circle.clip = true;
   circle.makeDraggable();
 
-  var token = ImageNode.load('token.jpg');
+  var token = ImageNode.load(image);
   token.dX = -radius,
   token.dY = -radius;
   token.dWidth = gridWidth;
@@ -188,6 +140,22 @@ $(function() {
   circle.when('mouseout', function() {
     circle.stroke = 'red';
   });
+  this.canvasElement = circle;
 
-  canvas.append(circle);
+  this.tokenElement = $('<li />').append($('<img width="30"/>').attr('src', image)).append($('<h3>').text('Thorn Lighthammer'));
+};
+Token.prototype = {
+  borderWidth: 4,
+};
+
+
+$(function() {
+  var canvas = new Canvas($('#mapWrapper')[0], 600, 600);
+  var background = new Image();
+  background.src = 'map.jpg';
+  canvas.fill = new Pattern(background, 'no-repeat');
+
+  var token = new Token('token.jpg');
+  canvas.append(token.canvasElement);
+  $('#tokenList').append(token.tokenElement);
 });
