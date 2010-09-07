@@ -1,0 +1,20 @@
+#mapWrapper {
+  float: left;
+}
+
+#tokenList {
+  float: left;
+}
+#tokenList li {
+  display: block;
+  clear: both;
+}
+#tokenList li img {
+  float: left;
+  padding: 3px;
+}
+#tokenList li h3 {
+  float: left;
+  clear: right;
+  margin-top: 3px;
+}

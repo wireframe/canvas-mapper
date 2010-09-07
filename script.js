@@ -102,10 +102,10 @@ Grid.prototype = {
   }
 };
 
-Token = function(image) {
-  this.positionX = 0;
-  this.positionY = 0;
-  
+Token = function(options) {
+  var image = options.image;
+  this.name = options.name;
+
   var gridWidth = 64;
   var radius = gridWidth / 2;
   var circle = new Circle(radius - this.borderWidth);
@@ -128,11 +128,9 @@ Token = function(image) {
     // console.log(e);
   });
   circle.when('focus', function(e){
-    this.focused = true;
     // console.log(e);
   });
   circle.when('blur', function(){
-    this.focused = false;
   });
   circle.when('mouseover', function() {
     circle.stroke = 'blue';
@@ -141,8 +139,7 @@ Token = function(image) {
     circle.stroke = 'red';
   });
   this.canvasElement = circle;
-
-  this.tokenElement = $('<li />').append($('<img width="30"/>').attr('src', image)).append($('<h3>').text('Thorn Lighthammer'));
+  this.tokenElement = $('<li />').append($('<img width="30"/>').attr('src', image)).append($('<h3>').text(this.name));
 };
 Token.prototype = {
   borderWidth: 4,
@@ -155,7 +152,13 @@ $(function() {
   background.src = 'map.jpg';
   canvas.fill = new Pattern(background, 'no-repeat');
 
-  var token = new Token('token.jpg');
+  var token = new Token({image: 'token.jpg', name: 'Thorn Lighthammer'});
   canvas.append(token.canvasElement);
   $('#tokenList').append(token.tokenElement);
+
+  var token2 = new Token({image: 'token2.png', name: 'Ur Dragort'});
+  canvas.append(token2.canvasElement);
+  $('#tokenList').append(token2.tokenElement);
+
+  $('#tokenList').sortable();
 });
