@@ -103,8 +103,7 @@ Grid.prototype = {
 };
 
 Token = function(options) {
-  var image = options.image;
-  this.name = options.name;
+  $.extend(this, this.defaults, options);
 
   var gridWidth = 64;
   var radius = gridWidth / 2;
@@ -116,7 +115,7 @@ Token = function(options) {
   circle.clip = true;
   circle.makeDraggable();
 
-  var token = ImageNode.load(image);
+  var token = ImageNode.load(this.image);
   token.dX = -radius,
   token.dY = -radius;
   token.dWidth = gridWidth;
@@ -139,9 +138,10 @@ Token = function(options) {
     circle.stroke = 'red';
   });
   this.canvasElement = circle;
-  this.tokenElement = $('<li />').append($('<img width="30"/>').attr('src', image)).append($('<h3>').text(this.name));
+  this.tokenElement = $('<li />').append($('<img width="30"/>').attr('src', this.image)).append($('<h3>').text(this.name));
 };
 Token.prototype = {
+  defaults: {},
   borderWidth: 4,
 };
 
