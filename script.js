@@ -157,14 +157,14 @@ Grid = Klass(CanvasNode, {
     this.background = ImageNode.load(image);
     this.append(this.background);
 
-    this.fog = new Rectangle(600, 600, {
-      cx: 0,
-      cy: 0,
-      fillOpacity: 0.3,
-      fill: '#999999',
-      zIndex: 100
-    });
-    this.background.append(this.fog);
+    // this.fog = new Rectangle(600, 600, {
+    //   cx: 0,
+    //   cy: 0,
+    //   fillOpacity: 0.3,
+    //   fill: '#999999',
+    //   zIndex: 100
+    // });
+    // this.background.append(this.fog);
 
     this.selection = new Rectangle(0,0, {
       stroke : 1,
