@@ -102,136 +102,141 @@ Grid.prototype = {
   }
 };
 
-Token = function(options) {
-  $.extend(this, this.defaults, options);
-
-  var gridWidth = 64;
-  var radius = gridWidth / 2;
-  var circle = new Circle(radius - this.borderWidth);
-  circle.x = radius;
-  circle.y = radius;
-  circle.stroke = 'red';
-  circle.strokeWidth = this.borderWidth;
-  circle.clip = true;
-  circle.makeDraggable();
-
-  var token = ImageNode.load(this.image);
-  token.dX = -radius,
-  token.dY = -radius;
-  token.dWidth = gridWidth;
-  token.dHeight = gridWidth;
-  circle.append(token);
-
-  circle.when('mousemove', function(e){
-    // this.stroke = 'black';
-    // console.log(e);
-  });
-  circle.when('focus', function(e){
-    this.zIndex += 1;
-    // console.log(e);
-  });
-  circle.when('blur', function(){
-  });
-  circle.when('mouseover', function() {
-    circle.stroke = 'blue';
-  });
-  circle.when('mouseout', function() {
-    circle.stroke = 'red';
-  });
-  this.canvasElement = circle;
-  this.tokenElement = $('<li />').append($('<img width="30"/>').attr('src', this.image)).append($('<h3>').text(this.name));
-};
-Token.prototype = {
+Token = Klass(CanvasNode, {
   defaults: {},
   borderWidth: 4,
-};
 
-// Level = Klass(CanvasNode, {
-//   
-// });
-Map = function(background) {
-  this.canvasElement = ImageNode.load(background);
+  initialize: function(options) {
+    CanvasNode.initialize.call(this);
+    $.extend(this, this.defaults, options);
 
-  this.selection = new Rectangle(0,0, {
-    stroke : 1,
-    strokeOpacity : 0.4,
-    stroke : '#00ff00',
-    fillOpacity : 0.1,
-    fill : '#00ff00',
-    visible : false,
-    zIndex : 999
-  })
-  this.canvasElement.append(this.selection);
+    var gridWidth = 64;
+    var radius = gridWidth / 2;
+    var circle = new Circle(radius - this.borderWidth);
+    circle.x = radius;
+    circle.y = radius;
+    circle.stroke = 'red';
+    circle.strokeWidth = this.borderWidth;
+    circle.clip = true;
+    circle.makeDraggable();
+    circle.when('mousemove', function(e){
+      // this.stroke = 'black';
+      // console.log(e);
+    });
+    circle.when('focus', function(e){
+      this.zIndex += 1;
+      // console.log(e);
+    });
+    circle.when('blur', function(){
+    });
+    circle.when('mouseover', function() {
+      circle.stroke = 'blue';
+    });
+    circle.when('mouseout', function() {
+      circle.stroke = 'red';
+    });
+    this.append(circle);
 
-  var self = this;
-  this.canvasElement.addEventListener('mousedown', function(ev) {
-    ev.preventDefault();
-  
-    var point = CanvasSupport.tMatrixMultiplyPoint(
-      CanvasSupport.tInvertMatrix(this.currentMatrix),
-      this.root.mouseX, this.root.mouseY
-    )
-    startX = this.root.mouseX
-    startY = this.root.mouseY
-    selectionStart = point
-    self.selection.x2 = self.selection.cx = point[0]
-    self.selection.y2 = self.selection.cy = point[1]
-  }, false)
-  this.canvasElement.addEventListener('drag', function(ev) {
-    var point = CanvasSupport.tMatrixMultiplyPoint(
-      CanvasSupport.tInvertMatrix(this.currentMatrix),
-      this.root.mouseX, this.root.mouseY
-    )
-    if (selectionStart && !self.selection.visible) {
-      var dx = startX - this.root.mouseX
-      var dy = startY - this.root.mouseY
-      var sqd = dx * dx + dy * dy
-      self.selection.visible = sqd > 81
-    }
-    if (self.selection.visible) {
-      self.selection.x2 = point[0]
-      self.selection.y2 = point[1]
-    }
-  }, false)
-  this.canvasElement.addEventListener('mouseup', function(ev) {
-    var point = CanvasSupport.tMatrixMultiplyPoint(
-      CanvasSupport.tInvertMatrix(this.currentMatrix),
-      this.root.mouseX, this.root.mouseY
-    )
-    if (selectionStart && self.selection.visible) {
-      self.selection.visible = false
-      selectionStart = null
-      // var selection = playerShipsInside(th.selectRect)
-      // if (ev.shiftKey) {
-      //   selection.forEach(Player.select.bind(Player))
-      // } else if (ev.altKey) {
-      //   selection.forEach(Player.deselect.bind(Player))
-      // } else {
-      //   Player.clearSelection()
-      //   selection.forEach(Player.select.bind(Player))
-      // }
-    } else if (selectionStart && (ev.canvasTarget == self.selection || ev.canvasTarget == self.canvasElement)) {
-      // Player.setWaypoint(point)
-      self.selection.visible = false
-      selectionStart = null
-    }
-  }, false);
-};
+    var token = ImageNode.load(this.image);
+    token.dX = -radius,
+    token.dY = -radius;
+    token.dWidth = gridWidth;
+    token.dHeight = gridWidth;
+    circle.append(token);
+  },
+
+  initiativeMarkup: function() {
+    return $('<li />').append($('<img width="30"/>').attr('src', this.image)).append($('<h3>').text(this.name));
+  }
+});
+
+Grid = Klass(CanvasNode, {
+  initialize: function(image) {
+    CanvasNode.initialize.call(this);
+    this.background = ImageNode.load(image);
+    this.append(this.background);
+
+    this.selection = new Rectangle(0,0, {
+      stroke : 1,
+      strokeOpacity : 0.4,
+      stroke : '#00ff00',
+      fillOpacity : 0.1,
+      fill : '#00ff00',
+      visible : false,
+      zIndex : 999
+    });
+    this.background.append(this.selection);
+
+    var self = this;
+    this.addEventListener('mousedown', function(ev) {
+      ev.preventDefault();
+
+      var point = CanvasSupport.tMatrixMultiplyPoint(
+        CanvasSupport.tInvertMatrix(this.currentMatrix),
+        this.root.mouseX, this.root.mouseY
+      );
+      startX = this.root.mouseX;
+      startY = this.root.mouseY;
+      self.selectionStart = point;
+      self.selection.x2 = self.selection.cx = point[0]
+      self.selection.y2 = self.selection.cy = point[1]
+    }, false)
+    this.addEventListener('drag', function(ev) {
+      var point = CanvasSupport.tMatrixMultiplyPoint(
+        CanvasSupport.tInvertMatrix(this.currentMatrix),
+        this.root.mouseX, this.root.mouseY
+      )
+      if (self.selectionStart && !self.selection.visible) {
+        var dx = startX - this.root.mouseX;
+        var dy = startY - this.root.mouseY;
+        var sqd = dx * dx + dy * dy;
+        self.selection.visible = sqd > 81;
+      }
+      if (self.selection.visible) {
+        self.selection.x2 = point[0];
+        self.selection.y2 = point[1];
+      }
+    }, false);
+    this.addEventListener('mouseup', function(ev) {
+      var point = CanvasSupport.tMatrixMultiplyPoint(
+        CanvasSupport.tInvertMatrix(this.currentMatrix),
+        this.root.mouseX, this.root.mouseY
+      );
+      if (self.selectionStart && self.selection.visible) {
+        self.selection.visible = false;
+        self.selectionStart = null;
+        // var selection = playerShipsInside(th.selectRect)
+        // if (ev.shiftKey) {
+        //   selection.forEach(Player.select.bind(Player))
+        // } else if (ev.altKey) {
+        //   selection.forEach(Player.deselect.bind(Player))
+        // } else {
+        //   Player.clearSelection()
+        //   selection.forEach(Player.select.bind(Player))
+        // }
+      } else if (self.selectionStart && (ev.canvasTarget == self.selection || ev.canvasTarget == self.background)) {
+        // Player.setWaypoint(point)
+        self.selection.visible = false;
+        self.selectionStart = null;
+      }
+    }, false);
+  }
+});
 
 
 $(function() {
   var canvas = new Canvas($('#mapWrapper')[0], 600, 600);
 
-  var map = new Map('map.jpg');
-  canvas.append(map.canvasElement);
+  var grid = new Grid('map.jpg');
+  canvas.append(grid);
   
   var token = new Token({image: 'token.jpg', name: 'Thorn Lighthammer'});
-  map.canvasElement.append(token.canvasElement);
-  $('#tokenList').append(token.tokenElement);
+  grid.append(token);
+  $('#tokenList').append(token.initiativeMarkup());
 
   var token2 = new Token({image: 'token2.png', name: 'Ur Dragort'});
-  map.canvasElement.append(token2.canvasElement);
-  $('#tokenList').append(token2.tokenElement);
+  grid.append(token2);
+  $('#tokenList').append(token2.initiativeMarkup());
 
   $('#tokenList').sortable();
 });
