@@ -105,6 +105,8 @@ Grid.prototype = {
 Token = Klass(CanvasNode, {
   defaults: {},
   borderWidth: 4,
+  borderColor: '#990000',
+  borderHoverColor: '#ff0000',
 
   initialize: function(options) {
     CanvasNode.initialize.call(this);
@@ -112,37 +114,36 @@ Token = Klass(CanvasNode, {
 
     var gridWidth = 64;
     var radius = gridWidth / 2;
-    var circle = new Circle(radius - this.borderWidth);
-    circle.x = radius;
-    circle.y = radius;
-    circle.stroke = 'red';
-    circle.strokeWidth = this.borderWidth;
-    circle.clip = true;
-    circle.makeDraggable();
-    circle.when('mousemove', function(e){
-      // this.stroke = 'black';
-      // console.log(e);
+    var border = new Circle(radius - this.borderWidth, {
+      x: radius,
+      y: radius,
+      stroke: this.borderColor,
+      strokeOpacity: 0.9,
+      strokeWidth: this.borderWidth,
+      clip: true
     });
-    circle.when('focus', function(e){
+    border.makeDraggable();
+    var self = this;
+    border.when('focus', function(e){
       this.zIndex += 1;
-      // console.log(e);
     });
-    circle.when('blur', function(){
+    border.when('blur', function(){
+      this.zIndex -= 1;
     });
-    circle.when('mouseover', function() {
-      circle.stroke = 'blue';
+    border.when('mouseover', function() {
+      this.stroke = self.borderHoverColor;
     });
-    circle.when('mouseout', function() {
-      circle.stroke = 'red';
+    border.when('mouseout', function() {
+      this.stroke = self.borderColor;
     });
-    this.append(circle);
+    this.append(border);
 
     var token = ImageNode.load(this.image);
     token.dX = -radius,
     token.dY = -radius;
     token.dWidth = gridWidth;
     token.dHeight = gridWidth;
-    circle.append(token);
+    border.append(token);
   },
 
   initiativeMarkup: function() {
@@ -158,9 +159,9 @@ Grid = Klass(CanvasNode, {
 
     this.selection = new Rectangle(0,0, {
       stroke : 1,
-      strokeOpacity : 0.4,
+      strokeOpacity : 0.6,
       stroke : '#00ff00',
-      fillOpacity : 0.1,
+      fillOpacity : 0.2,
       fill : '#00ff00',
       visible : false,
       zIndex : 999
