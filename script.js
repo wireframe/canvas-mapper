@@ -146,19 +146,91 @@ Token.prototype = {
   borderWidth: 4,
 };
 
+// Level = Klass(CanvasNode, {
+//   
+// });
+Map = function(background) {
+  this.canvasElement = ImageNode.load(background);
+
+  this.selection = new Rectangle(0,0, {
+    stroke : 1,
+    strokeOpacity : 0.4,
+    stroke : '#00ff00',
+    fillOpacity : 0.1,
+    fill : '#00ff00',
+    visible : false,
+    zIndex : 999
+  })
+  this.canvasElement.append(this.selection);
+
+  var self = this;
+  this.canvasElement.addEventListener('mousedown', function(ev) {
+    ev.preventDefault();
+  
+    var point = CanvasSupport.tMatrixMultiplyPoint(
+      CanvasSupport.tInvertMatrix(this.currentMatrix),
+      this.root.mouseX, this.root.mouseY
+    )
+    startX = this.root.mouseX
+    startY = this.root.mouseY
+    selectionStart = point
+    self.selection.x2 = self.selection.cx = point[0]
+    self.selection.y2 = self.selection.cy = point[1]
+  }, false)
+  this.canvasElement.addEventListener('drag', function(ev) {
+    var point = CanvasSupport.tMatrixMultiplyPoint(
+      CanvasSupport.tInvertMatrix(this.currentMatrix),
+      this.root.mouseX, this.root.mouseY
+    )
+    if (selectionStart && !self.selection.visible) {
+      var dx = startX - this.root.mouseX
+      var dy = startY - this.root.mouseY
+      var sqd = dx * dx + dy * dy
+      self.selection.visible = sqd > 81
+    }
+    if (self.selection.visible) {
+      self.selection.x2 = point[0]
+      self.selection.y2 = point[1]
+    }
+  }, false)
+  this.canvasElement.addEventListener('mouseup', function(ev) {
+    var point = CanvasSupport.tMatrixMultiplyPoint(
+      CanvasSupport.tInvertMatrix(this.currentMatrix),
+      this.root.mouseX, this.root.mouseY
+    )
+    if (selectionStart && self.selection.visible) {
+      self.selection.visible = false
+      selectionStart = null
+      // var selection = playerShipsInside(th.selectRect)
+      // if (ev.shiftKey) {
+      //   selection.forEach(Player.select.bind(Player))
+      // } else if (ev.altKey) {
+      //   selection.forEach(Player.deselect.bind(Player))
+      // } else {
+      //   Player.clearSelection()
+      //   selection.forEach(Player.select.bind(Player))
+      // }
+    } else if (selectionStart && (ev.canvasTarget == self.selection || ev.canvasTarget == self.canvasElement)) {
+      // Player.setWaypoint(point)
+      self.selection.visible = false
+      selectionStart = null
+    }
+  }, false);
+};
+
 
 $(function() {
   var canvas = new Canvas($('#mapWrapper')[0], 600, 600);
-  var background = new Image();
-  background.src = 'map.jpg';
-  canvas.fill = new Pattern(background, 'no-repeat');
 
+  var map = new Map('map.jpg');
+  canvas.append(map.canvasElement);
+  
   var token = new Token({image: 'token.jpg', name: 'Thorn Lighthammer'});
-  canvas.append(token.canvasElement);
+  map.canvasElement.append(token.canvasElement);
   $('#tokenList').append(token.tokenElement);
 
   var token2 = new Token({image: 'token2.png', name: 'Ur Dragort'});
-  canvas.append(token2.canvasElement);
+  map.canvasElement.append(token2.canvasElement);
   $('#tokenList').append(token2.tokenElement);
 
   $('#tokenList').sortable();
