@@ -127,6 +127,7 @@ Token = function(options) {
     // console.log(e);
   });
   circle.when('focus', function(e){
+    this.zIndex += 1;
     // console.log(e);
   });
   circle.when('blur', function(){
