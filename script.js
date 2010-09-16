@@ -157,6 +157,15 @@ Grid = Klass(CanvasNode, {
     this.background = ImageNode.load(image);
     this.append(this.background);
 
+    this.fog = new Rectangle(600, 600, {
+      cx: 0,
+      cy: 0,
+      fillOpacity: 0.3,
+      fill: '#999999',
+      zIndex: 100
+    });
+    this.background.append(this.fog);
+
     this.selection = new Rectangle(0,0, {
       stroke : 1,
       strokeOpacity : 0.6,
@@ -206,6 +215,14 @@ Grid = Klass(CanvasNode, {
       if (self.selectionStart && self.selection.visible) {
         self.selection.visible = false;
         self.selectionStart = null;
+        
+        // var fogReveal = new Rectangle(100, 100, {
+        //   cx: 0,
+        //   cy: 0,
+        //   crop: true
+        // });
+        // self.fog.append(fogReveal);
+        
         // var selection = playerShipsInside(th.selectRect)
         // if (ev.shiftKey) {
         //   selection.forEach(Player.select.bind(Player))
