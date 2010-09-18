@@ -168,4 +168,13 @@ $(function() {
     $('#tokenList').append(newToken.initiativeMarkup());
     return false;
   });
+  $('#zoomOut').click(function() {
+    grid.scale -= 0.1;
+    return false;
+  });
+  $('#zoomIn').click(function() {
+    grid.scale += 0.1;
+    return false;
+  });
+  
 });
