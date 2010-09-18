@@ -1,12 +1,7 @@
-#mapWrapper {
-  float: left;
-}
-
 #tokenList {
-  float: left;
+  list-style-type: none;
 }
 #tokenList li {
-  display: block;
   clear: both;
 }
 #tokenList li img {
@@ -17,4 +12,7 @@
   float: left;
   clear: right;
   margin-top: 3px;
+}
+#initiative form {
+  clear:both;
 }
