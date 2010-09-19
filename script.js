@@ -176,5 +176,21 @@ $(function() {
     grid.scale += 0.1;
     return false;
   });
+  $('#panUp').click(function() {
+    grid.y += 25;
+    return false;
+  });
+  $('#panDown').click(function() {
+    grid.y -= 25;
+    return false;
+  });
+  $('#panLeft').click(function() {
+    grid.x += 25;
+    return false;
+  });
+  $('#panRight').click(function() {
+    grid.x -= 25;
+    return false;
+  });
   
 });
