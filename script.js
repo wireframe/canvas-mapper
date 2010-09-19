@@ -55,6 +55,77 @@ Token = Klass(CanvasNode, {
   }
 });
 
+MouseSelection = Klass(Rectangle, {
+  stroke : 1,
+  strokeOpacity : 0.6,
+  stroke : '#00ff00',
+  fillOpacity : 0.2,
+  fill : '#00ff00',
+  visible : false,
+  zIndex : 999,
+
+  minSelectionDrag: 81,
+  startDrag: function() {
+    var point = CanvasSupport.tMatrixMultiplyPoint(
+      CanvasSupport.tInvertMatrix(this.currentMatrix),
+      this.root.mouseX, this.root.mouseY
+    );
+    this.startX = this.root.mouseX;
+    this.startY = this.root.mouseY;
+    this.selectionStart = point;
+    this.x2 = this.cx = point[0];
+    this.y2 = this.cy = point[1];
+  },
+  drag: function() {
+    var point = CanvasSupport.tMatrixMultiplyPoint(
+      CanvasSupport.tInvertMatrix(this.currentMatrix),
+      this.root.mouseX, this.root.mouseY
+    )
+    if (this.selectionStart && !this.visible) {
+      var dx = this.startX - this.root.mouseX;
+      var dy = this.startY - this.root.mouseY;
+      var sqd = dx * dx + dy * dy;
+      this.visible = sqd > this.minSelectionDrag;
+    }
+    if (this.visible) {
+      this.x2 = point[0];
+      this.y2 = point[1];
+    }
+  },
+  endDrag: function(ev) {
+    var point = CanvasSupport.tMatrixMultiplyPoint(
+      CanvasSupport.tInvertMatrix(this.currentMatrix),
+      this.root.mouseX, this.root.mouseY
+    );
+    if (this.selectionStart && this.visible) {
+      this.visible = false;
+      this.selectionStart = null;
+      
+      // var fogReveal = new Rectangle(100, 100, {
+      //   cx: 0,
+      //   cy: 0,
+      //   crop: true
+      // });
+      // self.fog.append(fogReveal);
+      
+      // var selection = playerShipsInside(th.selectRect)
+      // if (ev.shiftKey) {
+      //   selection.forEach(Player.select.bind(Player))
+      // } else if (ev.altKey) {
+      //   selection.forEach(Player.deselect.bind(Player))
+      // } else {
+      //   Player.clearSelection()
+      //   selection.forEach(Player.select.bind(Player))
+      // }
+    } else if (this.selectionStart && (ev.canvasTarget == this || ev.canvasTarget == this.parent)) {
+      // Player.setWaypoint(point)
+      this.visible = false;
+      this.selectionStart = null;
+    }
+    
+  }
+});
+
 Grid = Klass(CanvasNode, {
   initialize: function(image) {
     CanvasNode.initialize.call(this);
@@ -70,78 +141,20 @@ Grid = Klass(CanvasNode, {
     // });
     // this.background.append(this.fog);
 
-    this.selection = new Rectangle(0,0, {
-      stroke : 1,
-      strokeOpacity : 0.6,
-      stroke : '#00ff00',
-      fillOpacity : 0.2,
-      fill : '#00ff00',
-      visible : false,
-      zIndex : 999
-    });
+    this.selection = new MouseSelection();
     this.background.append(this.selection);
 
     var self = this;
     this.addEventListener('mousedown', function(ev) {
       ev.preventDefault();
-
-      var point = CanvasSupport.tMatrixMultiplyPoint(
-        CanvasSupport.tInvertMatrix(this.currentMatrix),
-        this.root.mouseX, this.root.mouseY
-      );
-      startX = this.root.mouseX;
-      startY = this.root.mouseY;
-      self.selectionStart = point;
-      self.selection.x2 = self.selection.cx = point[0]
-      self.selection.y2 = self.selection.cy = point[1]
-    }, false)
+      self.selection.startDrag();
+    });
     this.addEventListener('drag', function(ev) {
-      var point = CanvasSupport.tMatrixMultiplyPoint(
-        CanvasSupport.tInvertMatrix(this.currentMatrix),
-        this.root.mouseX, this.root.mouseY
-      )
-      if (self.selectionStart && !self.selection.visible) {
-        var dx = startX - this.root.mouseX;
-        var dy = startY - this.root.mouseY;
-        var sqd = dx * dx + dy * dy;
-        self.selection.visible = sqd > 81;
-      }
-      if (self.selection.visible) {
-        self.selection.x2 = point[0];
-        self.selection.y2 = point[1];
-      }
-    }, false);
+      self.selection.drag();
+    });
     this.addEventListener('mouseup', function(ev) {
-      var point = CanvasSupport.tMatrixMultiplyPoint(
-        CanvasSupport.tInvertMatrix(this.currentMatrix),
-        this.root.mouseX, this.root.mouseY
-      );
-      if (self.selectionStart && self.selection.visible) {
-        self.selection.visible = false;
-        self.selectionStart = null;
-        
-        // var fogReveal = new Rectangle(100, 100, {
-        //   cx: 0,
-        //   cy: 0,
-        //   crop: true
-        // });
-        // self.fog.append(fogReveal);
-        
-        // var selection = playerShipsInside(th.selectRect)
-        // if (ev.shiftKey) {
-        //   selection.forEach(Player.select.bind(Player))
-        // } else if (ev.altKey) {
-        //   selection.forEach(Player.deselect.bind(Player))
-        // } else {
-        //   Player.clearSelection()
-        //   selection.forEach(Player.select.bind(Player))
-        // }
-      } else if (self.selectionStart && (ev.canvasTarget == self.selection || ev.canvasTarget == self.background)) {
-        // Player.setWaypoint(point)
-        self.selection.visible = false;
-        self.selectionStart = null;
-      }
-    }, false);
+      self.selection.endDrag(ev);
+    });
   }
 });
 
