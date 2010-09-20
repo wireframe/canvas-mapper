@@ -4,11 +4,11 @@ Token = Klass(CanvasNode, {
   borderWidth: 4,
   borderColor: '#990000',
   borderHoverColor: '#ff0000',
+  isToken: true,
   bringToFront: function() {
     var maxZIndex = 0;
     $.each(this.parent.childNodes, function() {
-      console.log(this.zIndex);
-      if (this.zIndex > maxZIndex) {
+      if (this.isToken && this.zIndex > maxZIndex) {
         maxZIndex = this.zIndex;
       }
     });
