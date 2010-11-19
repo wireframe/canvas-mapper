@@ -21,7 +21,7 @@ Token = Klass(CanvasNode, {
 
     var gridWidth = 64;
     var radius = gridWidth / 2;
-    var border = new Circle(radius - this.borderWidth, {
+    this.border = new Circle(radius - this.borderWidth, {
       x: radius,
       y: radius,
       stroke: this.borderColor,
@@ -29,25 +29,25 @@ Token = Klass(CanvasNode, {
       strokeWidth: this.borderWidth,
       clip: true
     });
-    border.makeDraggable();
+    this.border.makeDraggable();
     var self = this;
-    border.when('focus', function(e){
+    this.border.when('focus', function(e){
       self.bringToFront();
     });
-    border.when('mouseover', function() {
-      border.stroke = self.borderHoverColor;
+    this.border.when('mouseover', function() {
+      self.border.stroke = self.borderHoverColor;
     });
-    border.when('mouseout', function() {
-      border.stroke = self.borderColor;
+    this.border.when('mouseout', function() {
+      self.border.stroke = self.borderColor;
     });
-    this.append(border);
+    this.append(this.border);
 
     var token = ImageNode.load(this.image);
     token.dX = -radius,
     token.dY = -radius;
     token.dWidth = gridWidth;
     token.dHeight = gridWidth;
-    border.append(token);
+    this.border.append(token);
   },
 
   initiativeMarkup: function() {
@@ -65,6 +65,17 @@ MouseSelection = Klass(Rectangle, {
   zIndex : 999,
 
   minSelectionDrag: 81,
+  selectedTokens: [],
+  selectTokens: function() {
+    var left = Math.min(this.cx, this.x2);
+    var right = Math.max(this.cx, this.x2);
+    var top = Math.min(this.cy, this.y2);
+    var bottom = Math.max(this.cy, this.y2);
+    this.selectedTokens = this.parent.parent.childNodes.filter(function(s) {
+      return s.isToken && (s.border.x >= left && s.border.x <= right && s.border.y >= top && s.border.y <= bottom);
+    });
+    console.log(this.selectedTokens);
+  },
   startDrag: function() {
     var point = CanvasSupport.tMatrixMultiplyPoint(
       CanvasSupport.tInvertMatrix(this.currentMatrix),
@@ -100,7 +111,8 @@ MouseSelection = Klass(Rectangle, {
     if (this.selectionStart && this.visible) {
       this.visible = false;
       this.selectionStart = null;
-      
+
+      this.selectTokens();
       // var fogReveal = new Rectangle(100, 100, {
       //   cx: 0,
       //   cy: 0,
