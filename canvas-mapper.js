@@ -14,6 +14,18 @@ Token = Klass(CanvasNode, {
     });
     this.zIndex = maxZIndex + 1;
   },
+  highlight: function() {
+    this.border.stroke = this.borderHoverColor;
+  },
+  removeHighlight: function() {
+    this.border.stroke = this.borderColor;
+  },
+  select: function() {
+    this.bringToFront();
+    this.parent.selection.clearSelection();
+    this.highlight();
+    this.parent.selection.selectedTokens = [this];
+  },
 
   initialize: function(options) {
     CanvasNode.initialize.call(this);
@@ -32,13 +44,7 @@ Token = Klass(CanvasNode, {
     this.border.makeDraggable();
     var self = this;
     this.border.when('focus', function(e){
-      self.bringToFront();
-    });
-    this.border.when('mouseover', function() {
-      self.border.stroke = self.borderHoverColor;
-    });
-    this.border.when('mouseout', function() {
-      self.border.stroke = self.borderColor;
+      self.select();
     });
     this.append(this.border);
 
@@ -74,7 +80,11 @@ MouseSelection = Klass(Rectangle, {
     this.selectedTokens = this.parent.parent.childNodes.filter(function(s) {
       return s.isToken && (s.border.x >= left && s.border.x <= right && s.border.y >= top && s.border.y <= bottom);
     });
-    console.log(this.selectedTokens);
+  },
+  clearSelection: function() {
+    _.each(this.selectedTokens, function(t) {
+      t.removeHighlight();
+    });
   },
   startDrag: function() {
     var point = CanvasSupport.tMatrixMultiplyPoint(
@@ -102,6 +112,11 @@ MouseSelection = Klass(Rectangle, {
       this.x2 = point[0];
       this.y2 = point[1];
     }
+    this.clearSelection();
+    this.selectTokens();
+    _.each(this.selectedTokens, function(s) {
+      s.highlight();
+    });
   },
   endDrag: function(ev) {
     var point = CanvasSupport.tMatrixMultiplyPoint(
@@ -130,11 +145,10 @@ MouseSelection = Klass(Rectangle, {
       //   selection.forEach(Player.select.bind(Player))
       // }
     } else if (this.selectionStart && (ev.canvasTarget == this || ev.canvasTarget == this.parent)) {
-      // Player.setWaypoint(point)
+      this.clearSelection();
       this.visible = false;
       this.selectionStart = null;
     }
-    
   }
 });
 
