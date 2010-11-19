@@ -285,13 +285,11 @@ button {  width: auto; overflow: visible; }
 /* application specific styles */
 #tokenList {
   list-style-type: none;
-  margin: 0;
-  padding: 0;
+  margin: 10px 0;
 }
 #tokenList li.ui-sortable-helper {
   border: 1px solid #fbcb09; background: #fdf5ce url(ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #c77405;
 }
-
 #tokenList li.placeholder {
   height: 1.5em; 
   line-height: 1.2em;
@@ -299,6 +297,7 @@ button {  width: auto; overflow: visible; }
   background: #ffe45c url(ui-lightness/images/ui-bg_highlight-soft_75_ffe45c_1x100.png) 50% top repeat-x; 
   color: #363636;
 }
-#initiative form {
-  clear:both;
+
+#newToken {
+  margin-bottom: 10px;
 }

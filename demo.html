@@ -10,11 +10,8 @@
     <link href="ui-lightness/jquery-ui-1.8.6.custom.css" media="screen" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <div id="initiative">
-      <h3>Initiative</h3>
-      <ul id="tokenList"></ul>
+    <div>
       <form id="newToken">
-        <h3>New Token</h3>
         <input type="text" name="name" placeholder="character name"/>
         <select name="image">
           <option value="token.jpg">token.jpg</option>
@@ -22,6 +19,9 @@
         </select>
         <button type="submit">Add Token</button>
       </form>
+    </div>
+    <div>
+      <ul id="tokenList"></ul>
     </div>
     <div id="mapWrapper"></div>
     <div id="mapControls">
