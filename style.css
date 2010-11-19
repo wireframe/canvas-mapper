@@ -289,7 +289,7 @@ button {  width: auto; overflow: visible; }
   padding: 0;
 }
 #tokenList li.ui-sortable-helper {
-  border: 1px solid #fbcb09; background: #fdf5ce url(images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #c77405;
+  border: 1px solid #fbcb09; background: #fdf5ce url(ui-lightness/images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x; font-weight: bold; color: #c77405;
 }
 
 #tokenList li.placeholder {
