@@ -1,9 +1,9 @@
 
 Token = Klass(CanvasNode, {
   defaults: {},
-  borderWidth: 4,
-  borderColor: '#990000',
-  borderHoverColor: '#ff0000',
+  borderWidth: 5,
+  borderColor: '#444444',
+  borderHoverColor: '#DD0000',
   isToken: true,
   bringToFront: function() {
     var maxZIndex = 0;
