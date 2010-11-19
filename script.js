@@ -12,7 +12,9 @@ $(function() {
   grid.append(token2);
   $('#tokenList').append(token2.initiativeMarkup());
 
-  $('#tokenList').sortable();
+  $('#tokenList').sortable({
+    placeholder: 'placeholder'
+  });
 
   $('#newToken').submit(function() {
     var newToken = new Token({image: $(this).find('option:selected').val(), name: $(this).find('input').val()});
